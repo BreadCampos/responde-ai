@@ -18,10 +18,209 @@ import { Button } from "@/components/button";
 import { useToggle } from "@/hooks/use-toggle";
 
 export const SurveyForm = () => {
+  // const [survey, setSurvey] = useState<Survey>({
+  //   id: crypto.randomUUID(),
+  //   title: "Formulário Sem Título",
+  //   questions: [],
+  // });
+
   const [survey, setSurvey] = useState<Survey>({
-    id: crypto.randomUUID(),
-    title: "Formulário Sem Título",
-    questions: [],
+    id: "survey-test-01-complex",
+    title: "Feedback de Produto e Experiência do Usuário",
+    questions: [
+      // --- PÁGINA 1: DADOS BÁSICOS ---
+      {
+        id: "q1_name",
+        label: "Primeiro, qual o seu nome?",
+        type: "text",
+        placeholder: "Digite seu nome completo",
+        pageIndex: 1,
+        orderIndex: 0,
+        validations: [
+          {
+            type: "required",
+            errorMessage: "O nome é obrigatório.",
+          },
+          {
+            type: "min_length",
+            options: { value: 3 },
+            errorMessage: "Por favor, insira um nome com pelo menos 3 letras.",
+          },
+        ],
+      },
+      {
+        id: "q1_email",
+        label: "E o seu melhor e-mail?",
+        type: "text",
+        placeholder: "exemplo@dominio.com",
+        hint: "Usado apenas para comunicação sobre a pesquisa.",
+        pageIndex: 1,
+        orderIndex: 1,
+        validations: [
+          { type: "required" },
+          {
+            type: "email",
+            errorMessage: "Por favor, insira um formato de e-mail válido.",
+          },
+        ],
+      },
+      {
+        id: "q1_contact_preference",
+        label:
+          "Você aceita receber um contato por telefone para falarmos sobre sua experiência?",
+        type: "radio",
+        pageIndex: 1,
+        orderIndex: 2,
+        selectOptions: [
+          { label: "Sim, aceito", value: "yes" },
+          {
+            label: "Não, prefiro não ser contatado",
+            value: "no",
+          },
+        ],
+        validations: [{ type: "required" }],
+      },
+      {
+        id: "q1_phone",
+        label: "Ótimo! Qual o seu telefone com DDD?",
+        type: "text",
+        placeholder: "(00) 00000-0000",
+        pageIndex: 1,
+        orderIndex: 3,
+        mask: ["(00) 0000-0000", "(00) 00000-0000"],
+        validations: [
+          {
+            type: "required",
+            errorMessage:
+              "Estou com problema de input com mask, coloque 'não' na anterior",
+          },
+        ],
+        conditional: {
+          fieldId: "q1_contact_preference",
+          operator: "equals",
+          value: "yes",
+        },
+      },
+
+      // --- PÁGINA 2: USO DO PRODUTO ---
+      {
+        id: "q2_main_product",
+        label: "Qual de nossos produtos você mais utiliza?",
+        type: "select",
+        placeholder: "Selecione o produto principal",
+        pageIndex: 2,
+        orderIndex: 0,
+        validations: [{ type: "required" }],
+        selectOptions: [
+          { label: "Produto Alpha", value: "alpha" },
+          { label: "Produto Beta", value: "beta" },
+          { label: "Produto Gamma", value: "gamma" },
+        ],
+      },
+      {
+        id: "q2_feature_rating",
+        label:
+          "Numa escala de 1 a 5, como você avalia a facilidade de uso do produto?",
+        type: "rating",
+        pageIndex: 2,
+        orderIndex: 1,
+        validations: [{ type: "required" }],
+        ratingOptions: {
+          min: 1,
+          max: 5,
+          style: "stars",
+        },
+      },
+      {
+        id: "q2_used_features",
+        label: "Quais destas funcionalidades você já utilizou?",
+        type: "checkbox_group",
+        hint: "Marque todas as opções aplicáveis.",
+        pageIndex: 2,
+        orderIndex: 2,
+        validations: [
+          {
+            type: "required",
+            errorMessage: "Por favor, selecione ao menos uma opção.",
+          },
+        ],
+        selectOptions: [
+          {
+            label: "Dashboard de Análises",
+            value: "dashboard",
+          },
+          {
+            label: "Relatórios Customizados",
+            value: "reports",
+          },
+          {
+            label: "Suporte via Chat",
+            value: "chat_support",
+          },
+        ],
+      },
+      {
+        id: "q2_first_use_date",
+        label: "Quando você começou a usar nosso produto?",
+        type: "date",
+        hint: "Pode ser uma data aproximada.",
+        pageIndex: 2,
+        orderIndex: 3,
+        validations: [
+          {
+            type: "max",
+            options: { value: new Date().toISOString().split("T")[0] }, // Define a data máxima como hoje
+            errorMessage: "A data não pode ser no futuro.",
+          },
+        ],
+      },
+
+      // --- PÁGINA 3: FEEDBACK DETALHADO ---
+      {
+        id: "q3_nps_score",
+        label:
+          "De 0 a 10, o quão provável você é de nos recomendar a um amigo ou colega?",
+        type: "rating",
+        hint: "0 = Nada provável, 10 = Com certeza!",
+        pageIndex: 3,
+        orderIndex: 0,
+        validations: [{ type: "required" }],
+        ratingOptions: {
+          min: 0,
+          max: 10,
+          style: "slider",
+        },
+      },
+      {
+        id: "q3_nps_promoter_reason",
+        label: "Ficamos felizes com a sua nota! O que mais te agradou?",
+        type: "textarea",
+        placeholder: "Nos conte o que te fez dar essa nota...",
+        pageIndex: 3,
+        orderIndex: 1,
+        conditional: {
+          fieldId: "q3_nps_score",
+          operator: "greater_than_equal",
+          value: "9",
+        },
+        validations: [{ type: "required" }],
+      },
+      {
+        id: "q3_nps_detractor_reason",
+        label:
+          "Lamentamos por não atender suas expectativas. O que podemos fazer para melhorar?",
+        type: "textarea",
+        placeholder: "Seu feedback é muito importante para nós...",
+        pageIndex: 3,
+        orderIndex: 2,
+        conditional: {
+          fieldId: "q3_nps_score",
+          operator: "less_than_equal",
+          value: "6",
+        },
+        validations: [{ type: "required" }],
+      },
+    ],
   });
 
   const addNewQuestion = (newQuestion: SurveyQuestion) => {
@@ -166,7 +365,7 @@ export const SurveyForm = () => {
   return (
     <Form {...methods}>
       <div className="flex flex-col items-center justify-center p-4">
-        <div className="mb-4 text-center flex justify-between items-center w-8/12">
+        <div className="mb-4 text-left flex justify-between items-center w-8/12">
           <EditableTitle
             initialTitle={survey.title}
             onSave={handleTitleChange}

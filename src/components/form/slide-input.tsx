@@ -16,7 +16,7 @@ export const SlideInput = ({ name, question, rules }: Props) => {
       rules={rules}
       defaultValue={question?.ratingOptions?.min}
       render={({ field, fieldState: { error } }) => (
-        <div className="form-control w-full bg-red-200">
+        <div className="form-control w-full ">
           {question.label && (
             <Label className={error ? "text-destructive" : ""}>
               {question.label}

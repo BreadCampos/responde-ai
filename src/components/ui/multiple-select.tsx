@@ -172,7 +172,9 @@ export const MultiSelect = React.forwardRef<
       if (value.length === options.length) {
         handleClear();
       } else {
-        const allValues = options.map((option) => option.value);
+        const allValues = options
+          .map((option) => option.value)
+          .filter((v): v is string => typeof v === "string");
         onValueChange(allValues);
       }
     };
@@ -298,11 +300,11 @@ export const MultiSelect = React.forwardRef<
                   <span>(Select All)</span>
                 </CommandItem>
                 {options.map((option) => {
-                  const isSelected = value.includes(option.value);
+                  const isSelected = value.includes(String(option?.value));
                   return (
                     <CommandItem
-                      key={option.value}
-                      onSelect={() => toggleOption(option.value)}
+                      key={String(option?.value)}
+                      onSelect={() => toggleOption(String(option?.value))}
                       className="cursor-pointer"
                     >
                       <div
