@@ -6,7 +6,7 @@ import {
   validationMap,
   type QuestionValidatorsType,
   type SurveyQuestionInputType,
-} from "@/survey/type/survey";
+} from "@/survey-form/type/survey";
 import { Button } from "@/components/button";
 import { SelectInput } from "@/components/form/select-input";
 import { TextInput } from "@/components/form/text-input";

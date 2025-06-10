@@ -16,7 +16,7 @@ import type {
   SelectOption,
   SurveyQuestion,
   SurveyQuestionInputType,
-} from "@/survey/type/survey";
+} from "@/survey-form/type/survey";
 import { QuestionPreview } from "./components/question-preview";
 import { ConditionalValues } from "./components/conditional-values";
 import { ValidationRules } from "./components/validation-rules";

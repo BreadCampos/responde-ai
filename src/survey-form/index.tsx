@@ -1,9 +1,10 @@
 import { useState, useMemo, type MouseEvent } from "react";
+import { EditableTitle } from "./components/editable-title";
+import type { Survey, SurveyQuestion } from "./type/survey";
 
 import { Form } from "@/components/ui/form";
 import { ServeyModal } from "./components/survey-modal";
 import { useForm } from "react-hook-form";
-
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -14,26 +15,63 @@ import { SortableQuestionItem } from "./components/sortable-question-item";
 import { toast } from "sonner";
 import { shouldShowQuestion } from "./helper/shouled-show-question";
 import { Button } from "@/components/button";
-import type { SurveyQuestion } from "./type/survey";
 import { useToggle } from "@/hooks/use-toggle";
 
-export const Survey = () => {
-  const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
+export const SurveyForm = () => {
+  const [survey, setSurvey] = useState<Survey>({
+    id: crypto.randomUUID(),
+    title: "Formulário Sem Título",
+    questions: [],
+  });
 
   const addNewQuestion = (newQuestion: SurveyQuestion) => {
-    setQuestions((prev) =>
-      [...prev, newQuestion].sort((a, b) => a.pageIndex - b.pageIndex)
-    );
+    setSurvey((prevSurvey) => ({
+      ...prevSurvey,
+      questions: [...prevSurvey.questions, newQuestion].sort(
+        (a, b) => a.pageIndex - b.pageIndex
+      ),
+    }));
     toast.success("Pergunta adicionada com sucesso.");
   };
 
+  const updateQuestion = (updatedQuestion: SurveyQuestion) => {
+    setSurvey((prevSurvey) => ({
+      ...prevSurvey,
+      questions: prevSurvey.questions.map((q) =>
+        q.id === updatedQuestion.id ? updatedQuestion : q
+      ),
+    }));
+    toast.success("Pergunta atualizada com sucesso.");
+  };
+
+  const deleteQuestion = (questionId: string) => {
+    const isDependency = survey.questions.some(
+      (q) => q.conditional?.fieldId === questionId
+    );
+    if (
+      isDependency &&
+      !confirm(
+        "Atenção: Outra pergunta depende desta. Deseja realmente deletá-la?"
+      )
+    ) {
+      return;
+    }
+    setSurvey((prevSurvey) => ({
+      ...prevSurvey,
+      questions: prevSurvey.questions.filter((q) => q.id !== questionId),
+    }));
+    toast.success("Pergunta deletada com sucesso.");
+  };
+
+  const handleTitleChange = (newTitle: string) => {
+    setSurvey((prevSurvey) => ({
+      ...prevSurvey,
+      title: newTitle,
+    }));
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
-
-  const methods = useForm({
-    mode: "onTouched",
-    shouldUnregister: false,
-  });
-
+  const methods = useForm({ mode: "onTouched", shouldUnregister: false });
   const [isModalOpen, toggleModal] = useToggle(false);
   const [questionToEdit, setQuestionToEdit] = useState<SurveyQuestion | null>(
     null
@@ -49,42 +87,16 @@ export const Survey = () => {
     toggleModal();
   };
 
-  const updateQuestion = (updatedQuestion: SurveyQuestion) => {
-    setQuestions((prev) =>
-      prev.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
-    );
-    toast.success("Pergunta atualizada com sucesso.");
-  };
-
-  const deleteQuestion = (questionId: string) => {
-    const isDependency = questions.some(
-      (q) => q.conditional?.fieldId === questionId
-    );
-
-    if (isDependency) {
-      if (
-        !confirm(
-          "Atenção: Outra pergunta depende desta. Deseja realmente deletá-la?"
-        )
-      ) {
-        return;
-      }
-    }
-
-    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
-    toast.success("Pergunta deletada com sucesso.");
-  };
-
   const { trigger, getValues, handleSubmit } = methods;
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      const oldIndex = questions.findIndex((q) => q.id === active.id);
-      const newIndex = questions.findIndex((q) => q.id === over.id);
+      const oldIndex = survey?.questions.findIndex((q) => q.id === active.id);
+      const newIndex = survey?.questions.findIndex((q) => q.id === over.id);
 
-      const newOrder = arrayMove(questions, oldIndex, newIndex);
+      const newOrder = arrayMove(survey?.questions, oldIndex, newIndex);
       const movedItem = newOrder[newIndex];
 
       if (movedItem.conditional) {
@@ -102,18 +114,18 @@ export const Survey = () => {
         }
       }
 
-      setQuestions(newOrder);
+      setSurvey((prevSurvey) => ({ ...prevSurvey, questions: newOrder }));
     }
   }
 
   const totalPages = useMemo(() => {
-    if (questions.length === 0) return 1;
-    return Math.max(...questions.map((q) => q.pageIndex), 1);
-  }, [questions]);
+    if (survey.questions.length === 0) return 1;
+    return Math.max(...survey.questions.map((q) => q.pageIndex), 1);
+  }, [survey.questions]);
 
   const questionsOnCurrentPage = useMemo(() => {
-    return questions.filter((q) => q.pageIndex === currentPage);
-  }, [currentPage, questions]);
+    return survey.questions.filter((q) => q.pageIndex === currentPage);
+  }, [currentPage, survey.questions]);
 
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -121,28 +133,21 @@ export const Survey = () => {
     e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>
   ) => {
     if (isNavigating) return;
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-
+    e.preventDefault();
     setIsNavigating(true);
     try {
-      const visibleFieldsOnPage = questions
+      const visibleFieldsOnPage = survey.questions
         .filter(
           (q) =>
             q.pageIndex === currentPage && shouldShowQuestion(q, getValues())
         )
         .map((q) => q.id);
-
       const isValid = await trigger(visibleFieldsOnPage);
-
       if (isValid && currentPage < totalPages) {
         setCurrentPage((p) => p + 1);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
     } finally {
-      // Garante que o estado seja resetado no final, com sucesso ou erro.
       setIsNavigating(false);
     }
   };
@@ -154,22 +159,28 @@ export const Survey = () => {
   };
 
   const onSubmit = () => {
+    console.log("Formulário completo para envio:", survey);
     toast.success("Simulação de envio do formulário completo.");
   };
 
   return (
     <Form {...methods}>
       <div className="flex flex-col items-center justify-center p-4">
-        <h1 className="text-2xl font-bold mb-4">Criar Pesquisa</h1>
-        <Button onClick={handleOpenToAdd} className="mb-4">
-          Adicionar Pergunta +
-        </Button>
+        <div className="mb-4 text-center flex justify-between items-center w-8/12">
+          <EditableTitle
+            initialTitle={survey.title}
+            onSave={handleTitleChange}
+            className="text-3xl font-bold text-gray-800"
+          />
+
+          <Button onClick={handleOpenToAdd}>Adicionar Pergunta +</Button>
+        </div>
         <ServeyModal
           isOpen={isModalOpen}
           onClose={toggleModal}
           onAddQuestion={addNewQuestion}
           onUpdateQuestion={updateQuestion}
-          existingQuestions={questions}
+          existingQuestions={survey.questions}
           questionToEdit={questionToEdit}
         />
         <form
@@ -196,14 +207,14 @@ export const Survey = () => {
               </SortableContext>
             </DndContext>
 
-            {questions.length === 0 && (
+            {survey.questions.length === 0 && (
               <p className="text-gray-500 text-center py-8">
                 Adicione uma pergunta para começar.
               </p>
             )}
           </div>
 
-          {questions.length > 0 && (
+          {survey.questions.length > 0 && (
             <div className="flex items-center justify-between sticky bottom-0 bg-white/90 backdrop-blur-sm p-4 border-t-2 mt-4 shadow-lg rounded-t-lg">
               <Button
                 type="button"

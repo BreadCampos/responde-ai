@@ -12,7 +12,7 @@ import {
   operatorMap,
   type QuestionConditionOperators,
   type SurveyQuestion,
-} from "@/survey/type/survey";
+} from "@/survey-form/type/survey";
 
 import type { IForm } from "../../index";
 import { XIcon } from "lucide-react";

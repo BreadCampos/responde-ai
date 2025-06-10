@@ -1,5 +1,5 @@
-import { InputPreview } from "@/survey/components/input-preview";
-import type { SurveyQuestion } from "@/survey/type/survey";
+import { InputPreview } from "@/survey-form/components/input-preview";
+import type { SurveyQuestion } from "@/survey-form/type/survey";
 
 export const QuestionPreview = (options: SurveyQuestion) => {
   return (

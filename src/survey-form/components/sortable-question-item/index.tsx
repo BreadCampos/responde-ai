@@ -1,10 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { InputPreview } from "@/survey/components/input-preview";
+import { InputPreview } from "@/survey-form/components/input-preview";
 import { ChevronsUpDown, Edit, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import { shouldShowQuestion } from "@/survey/helper/shouled-show-question";
-import type { SurveyQuestion } from "@/survey/type/survey";
+import { shouldShowQuestion } from "@/survey-form/helper/shouled-show-question";
+import type { SurveyQuestion } from "@/survey-form/type/survey";
 
 interface Props {
   question: SurveyQuestion;

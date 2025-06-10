@@ -1,13 +1,13 @@
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
-import { Survey } from "./survey";
+import { SurveyForm } from "./survey-form";
 
 function App() {
   return (
     <>
       <Toaster />
 
-      <Survey />
+      <SurveyForm />
     </>
   );
 }

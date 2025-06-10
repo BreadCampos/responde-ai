@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type { SurveyQuestion } from "@/survey/type/survey";
+import type { SurveyQuestion } from "@/survey-form/type/survey";
 
 const parseIfNumber = (value: any): any => {
   if (value === null || value === undefined || Array.isArray(value)) {
