@@ -1,16 +1,18 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { InputPreview } from "@/survey/components/input-preview";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Edit, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 import { shouldShowQuestion } from "@/survey/helper/shouled-show-question";
 import type { SurveyQuestion } from "@/survey/type/survey";
 
 interface Props {
   question: SurveyQuestion;
+  onDelete: (questionId: string) => void;
+  onEdit: (question: SurveyQuestion) => void;
 }
 
-export function SortableQuestionItem({ question }: Props) {
+export function SortableQuestionItem({ onDelete, question, onEdit }: Props) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: question.id });
 
@@ -40,8 +42,26 @@ export function SortableQuestionItem({ question }: Props) {
           <InputPreview question={question} />
         </div>
 
-        <div {...listeners} className="p-2 cursor-grab">
-          <ChevronsUpDown />
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={() => onEdit(question)}
+            className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors"
+            title="Editar pergunta"
+          >
+            <Edit className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(question.id)}
+            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
+            aria-label="Deletar pergunta"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+
+          <div {...listeners} className="p-2 cursor-grab">
+            <ChevronsUpDown />
+          </div>
         </div>
       </div>
     </div>

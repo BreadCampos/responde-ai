@@ -50,7 +50,7 @@ export const SelectInput = ({
   description,
   options,
   loading = false,
-  isRequired, // Alterado aqui
+  required, // Alterado aqui
   rules,
   disabled,
   triggerClassName,
@@ -62,9 +62,9 @@ export const SelectInput = ({
 
   // SUGESTÃO DE MELHORIA APLICADA AQUI
   const validationRules: RegisterOptions = { ...rules };
-  if (isRequired && !validationRules.required) {
+  if (required && !validationRules.required) {
     validationRules.required =
-      typeof isRequired === "string" ? isRequired : "Este campo é obrigatório";
+      typeof required === "string" ? required : "Este campo é obrigatório";
   }
 
   return (
@@ -77,7 +77,7 @@ export const SelectInput = ({
           {label && (
             <FormLabel className={cn(fieldState.error && "text-destructive")}>
               {label}
-              {isRequired && <span className="ml-0.5 text-destructive">*</span>}
+              {required && <span className="ml-0.5 text-destructive">*</span>}
             </FormLabel>
           )}
           <Select

@@ -15,21 +15,65 @@ import { toast } from "sonner";
 import { shouldShowQuestion } from "./helper/shouled-show-question";
 import { Button } from "@/components/button";
 import type { SurveyQuestion } from "./type/survey";
+import { useToggle } from "@/hooks/use-toggle";
 
 export const Survey = () => {
   const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
 
   const addNewQuestion = (newQuestion: SurveyQuestion) => {
     setQuestions((prev) =>
-      [...(prev ?? []), newQuestion].sort((a, b) => a.pageIndex - b.pageIndex)
+      [...prev, newQuestion].sort((a, b) => a.pageIndex - b.pageIndex)
     );
+    toast.success("Pergunta adicionada com sucesso.");
   };
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const methods = useForm({
     mode: "onTouched",
     shouldUnregister: false,
   });
+
+  const [isModalOpen, toggleModal] = useToggle(false);
+  const [questionToEdit, setQuestionToEdit] = useState<SurveyQuestion | null>(
+    null
+  );
+
+  const handleOpenToAdd = () => {
+    setQuestionToEdit(null);
+    toggleModal();
+  };
+
+  const handleOpenToEdit = (question: SurveyQuestion) => {
+    setQuestionToEdit(question);
+    toggleModal();
+  };
+
+  const updateQuestion = (updatedQuestion: SurveyQuestion) => {
+    setQuestions((prev) =>
+      prev.map((q) => (q.id === updatedQuestion.id ? updatedQuestion : q))
+    );
+    toast.success("Pergunta atualizada com sucesso.");
+  };
+
+  const deleteQuestion = (questionId: string) => {
+    const isDependency = questions.some(
+      (q) => q.conditional?.fieldId === questionId
+    );
+
+    if (isDependency) {
+      if (
+        !confirm(
+          "Atenção: Outra pergunta depende desta. Deseja realmente deletá-la?"
+        )
+      ) {
+        return;
+      }
+    }
+
+    setQuestions((prev) => prev.filter((q) => q.id !== questionId));
+    toast.success("Pergunta deletada com sucesso.");
+  };
 
   const { trigger, getValues, handleSubmit } = methods;
 
@@ -117,9 +161,16 @@ export const Survey = () => {
     <Form {...methods}>
       <div className="flex flex-col items-center justify-center p-4">
         <h1 className="text-2xl font-bold mb-4">Criar Pesquisa</h1>
+        <Button onClick={handleOpenToAdd} className="mb-4">
+          Adicionar Pergunta +
+        </Button>
         <ServeyModal
+          isOpen={isModalOpen}
+          onClose={toggleModal}
           onAddQuestion={addNewQuestion}
+          onUpdateQuestion={updateQuestion}
           existingQuestions={questions}
+          questionToEdit={questionToEdit}
         />
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -135,7 +186,12 @@ export const Survey = () => {
                 strategy={verticalListSortingStrategy}
               >
                 {questionsOnCurrentPage.map((q) => (
-                  <SortableQuestionItem key={q.id} question={q} />
+                  <SortableQuestionItem
+                    key={q.id}
+                    question={q}
+                    onDelete={deleteQuestion}
+                    onEdit={handleOpenToEdit}
+                  />
                 ))}
               </SortableContext>
             </DndContext>

@@ -71,7 +71,7 @@ export const ConditionalValues = ({ existingQuestions }: Props) => {
     setValue("conditionalOperator", undefined);
   }, [formValues.conditionalFieldId, setValue]);
 
-  if (existingQuestions.length === 0) return null;
+  if (existingQuestions.length === 1) return null;
 
   return (
     <div className="space-y-3 pt-4 border-t">

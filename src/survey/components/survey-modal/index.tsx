@@ -7,7 +7,6 @@ import { TextInput } from "@/components/form/text-input";
 import Modal from "@/components/modal";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { useToggle } from "@/hooks/use-toggle";
 import { useFieldArray, useForm } from "react-hook-form";
 import { XIcon } from "lucide-react";
 import { Label } from "@/components/ui/label";
@@ -24,6 +23,10 @@ import { ValidationRules } from "./components/validation-rules";
 
 interface Props {
   onAddQuestion: (question: SurveyQuestion) => void;
+  onUpdateQuestion: (question: SurveyQuestion) => void;
+  isOpen: boolean;
+  onClose: () => void;
+  questionToEdit: SurveyQuestion | null;
   existingQuestions: SurveyQuestion[];
 }
 
@@ -56,9 +59,14 @@ export interface IForm {
     style: "stars" | "slider";
   };
 }
-export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
-  const [open, toggleOpen] = useToggle();
-
+export const ServeyModal = ({
+  onAddQuestion,
+  onUpdateQuestion,
+  isOpen,
+  onClose,
+  questionToEdit,
+  existingQuestions,
+}: Props) => {
   const methods = useForm<IForm>({
     defaultValues: {
       pageIndex: 1,
@@ -72,10 +80,11 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
     formState: { errors },
   } = methods;
 
-  const onClose = () => {
-    toggleOpen();
+  const handleInternalClose = () => {
+    onClose();
     reset();
   };
+
   const formValues = watch();
 
   const typesWithOptions = [
@@ -94,7 +103,7 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
       });
       return;
     }
-    const newQuestion: SurveyQuestion = {
+    const transformedQuestionData: SurveyQuestion = {
       id: crypto.randomUUID(),
       label: data.label,
       type: data.type,
@@ -116,13 +125,13 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
       data.conditionalOperator
     ) {
       if (data.conditionalOperator === "is_one_of" && data.conditionalValues) {
-        newQuestion.conditional = {
+        transformedQuestionData.conditional = {
           fieldId: data.conditionalFieldId,
           operator: "is_one_of",
           value: data.conditionalValues.map((item) => item.text),
         };
       } else if (data.conditionalValue != null) {
-        newQuestion.conditional = {
+        transformedQuestionData.conditional = {
           fieldId: data.conditionalFieldId,
           operator: data.conditionalOperator,
           value: data.conditionalValue,
@@ -130,8 +139,10 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
       }
     }
 
-    if (onAddQuestion) {
-      onAddQuestion(newQuestion);
+    if (questionToEdit) {
+      onUpdateQuestion({ ...transformedQuestionData, id: questionToEdit.id });
+    } else {
+      onAddQuestion({ ...transformedQuestionData, id: crypto.randomUUID() });
     }
 
     onClose();
@@ -157,19 +168,40 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
 
   useEffect(() => {
     methods.setValue("validations", []);
-  }, [formValues?.type]);
+  }, [formValues.type, methods]);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (questionToEdit) {
+        const editionValues = {
+          ...questionToEdit,
+          mask: Array.isArray(questionToEdit.mask)
+            ? questionToEdit.mask.join(",")
+            : undefined,
+        };
+        reset(editionValues);
+      } else {
+        reset({
+          pageIndex: 1,
+          validations: [],
+          selectOptions: [],
+        });
+      }
+    }
+  }, [isOpen, questionToEdit, reset]);
 
   return (
     <div>
-      <Button onClick={toggleOpen} className="mb-4">
-        Adicionar Perguntas +
-      </Button>
       <Form {...methods}>
         <Modal
-          open={open}
-          onClose={onClose}
-          title="Survey Modal"
-          description="Adicione uma nova questão ao questionário"
+          open={isOpen}
+          onClose={handleInternalClose}
+          title={questionToEdit ? "Editar Questão" : "Adicionar Questão"}
+          description={
+            questionToEdit
+              ? "Está no modo edição de uma questão já existente"
+              : "Adicione uma nova questão ao questionário"
+          }
           primaryButton={{
             title: "Salvar",
             onClick: handleSubmit(onSubmit),
@@ -180,14 +212,14 @@ export const ServeyModal = ({ onAddQuestion, existingQuestions }: Props) => {
             <div className="flex-1 space-y-4  overflow-y-auto max-h-[40vh] px-5">
               <h3 className="text-lg font-semibold mb-2">Especificação</h3>
               <TextInput name={"label"} label={"Titulo da questão"} required />
-              <TextInput name={"placeholder"} label={"Placeholder"} />
-              <TextInput name={"hint"} label={"Dica"} />
               <SelectInput
                 required
                 name={"type"}
                 label={"Tipo de questão"}
                 options={typeOptions}
               />
+              <TextInput name={"placeholder"} label={"Placeholder"} />
+              <TextInput name={"hint"} label={"Dica"} />
               <TextInput
                 name={"pageIndex"}
                 label={"Número da Página"}

@@ -70,7 +70,7 @@ export type SurveyQuestion = {
   type: SurveyQuestionInputType;
   validations: Array<QuestionValidators>;
   placeholder?: string;
-  hint?: string | null;
+  hint?: string;
   mask?: string[] | null;
   selectOptions?: Array<SelectOption>;
   ratingOptions?: RatingOptions;
