@@ -4,22 +4,33 @@ import { Form } from "@/application/shared/components/ui/form";
 import { useToggle } from "@/application/shared/hooks/use-toggle";
 import { Eye, EyeClosed } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { loginResolver, type LoginFormValues } from "./login.schema";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/core/routes/route-constants";
 
 export const LoginScreen = () => {
-  const methods = useForm({});
+  const methods = useForm<LoginFormValues>({
+    resolver: loginResolver,
+  });
   const [showPassword, setShowPassword] = useToggle();
 
-  const onSubmit = (data: any) => {
+  const navigate = useNavigate();
+  const redirectToRegister = () => {
+    navigate(ROUTES.REGISTER);
+  };
+
+  const onSubmit = (data: LoginFormValues) => {
     console.log("Form submitted with data:", data);
     // Handle login logic here};
+    toast.success("não integrado!");
   };
+
   return (
     <Form {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-card-foreground">
-            Login Screen
-          </h1>
+          <h1 className="text-2xl font-bold text-card-foreground">Login</h1>
           <p className="text-sm text-muted-foreground">
             Por favor, insira suas credenciais para fazer login.
           </p>
@@ -51,7 +62,7 @@ export const LoginScreen = () => {
               </Button>
             }
           />
-          <Button type="button" variant={"link"}>
+          <Button type="button" variant={"link"} disabled>
             Esqueci minha Senha
           </Button>
         </div>
@@ -60,7 +71,7 @@ export const LoginScreen = () => {
             Entrar
           </Button>
 
-          <Button type="button" variant={"link"}>
+          <Button type="button" variant={"link"} onClick={redirectToRegister}>
             Criar Conta
           </Button>
         </div>

@@ -1,4 +1,3 @@
-// src/components/theme-toggle-button.tsx
 "use client";
 
 import { Moon, Sun } from "lucide-react";
@@ -14,9 +13,9 @@ export function ThemeToggleButton() {
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
-        <Moon className="h-5 w-5" />
+        <Moon className="h-5 w-5 text-slate-800" />
       ) : (
-        <Sun className="h-5 w-5" />
+        <Sun className="h-5 w-5 text-slate-200" />
       )}
     </button>
   );

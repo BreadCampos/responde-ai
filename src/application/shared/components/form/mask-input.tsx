@@ -29,10 +29,11 @@ const MaskedInputCore = React.forwardRef<
   HTMLInputElement,
   MaskedInputCoreProps
 >(({ field, mask, ...props }, forwardedRef) => {
-  const { ref: iMaskRef } = useIMask({
+  const { ref: iMaskRef, value } = useIMask({
     mask,
     unmask: true,
     onAccept: (value: any) => {
+      console.log({ value });
       field.onChange(value);
     },
   });
@@ -40,7 +41,9 @@ const MaskedInputCore = React.forwardRef<
   const handleRef = React.useCallback(
     (element: HTMLInputElement | null) => {
       field.ref(element);
-      iMaskRef.current = element;
+      if (iMaskRef && "current" in iMaskRef) {
+        iMaskRef.current = element;
+      }
 
       if (typeof forwardedRef === "function") {
         forwardedRef(element);
@@ -51,11 +54,16 @@ const MaskedInputCore = React.forwardRef<
     [field, iMaskRef, forwardedRef]
   );
 
+  React.useEffect(() => {
+    field.onChange(value);
+  }, [field, value]);
+
   return (
     <Input
       {...props}
       ref={handleRef}
       name={field.name}
+      value={field.value}
       defaultValue={field.value}
     />
   );

@@ -1,171 +1,101 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { APP_ENV } from "@/env";
+import {
+  UnauthorizedError,
+  type HttpRequest,
+  type HttpResponse,
+} from "./types";
+import { useAuthStore } from "@/application/feature/authentication/store/use-auth.store";
 
-import { authenticationApi } from "~/application/feature/authentication/api";
-
-export interface HttpRequest {
-  url: string;
-  method: "GET" | "POST" | "PUT" | "DELETE";
-  headers?: Record<string, string>;
-  body?: any;
-}
-
-export interface HttpResponse<T = any> {
-  status: number;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-  };
-}
-
-export class AuthorizedHttpClient {
-  private readonly whiteListUrl = [authenticationApi?.SING_UP_LOCAL];
-
-  private readonly baseUrl: string = process.env.APP_URL;
+class HttpClient {
+  private readonly baseUrl?: string = APP_ENV.APP_URL;
 
   private readonly refreshTokenKey: string = "REFRESH_TOKEN";
   private readonly tokenKey: string = "AUTH_TOKEN";
 
   async request<T>(data: HttpRequest): Promise<HttpResponse<T>> {
-    const token = await AsyncStorage.getItem(this.tokenKey);
+    const token = useAuthStore.getState().accessToken;
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...data.headers,
+    };
 
     if (token) {
-      data.headers = {
-        ...data.headers,
-        Authorization: `Bearer ${token}`,
-      };
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    console.log({ token });
+    const response = await fetch(`${this.baseUrl}${data.url}`, {
+      method: data.method,
+      headers,
+      body: data.body ? JSON.stringify(data.body) : undefined,
+    });
+
+    if (response.status === 204) {
+      return { status: response.status, data: undefined };
     }
 
-    try {
-      const response = await fetch(`${this.baseUrl}${data.url}`, {
-        method: data.method,
-        headers: {
-          "Content-Type": "application/json",
-          ...data.headers,
-        },
-        body: data.body ? JSON.stringify(data.body) : undefined,
-      });
+    const responseText = await response.text();
+    const responseData = responseText ? JSON.parse(responseText) : null;
 
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        if (
-          responseData.error?.statusCode === "ExpiredTokenException" &&
-          !this.whiteListUrl.some((url) => data.url.includes(url))
-        ) {
-          const refreshToken = await AsyncStorage.getItem(this.refreshTokenKey);
-          const tokenOrError = await this.getRefreshToken(refreshToken);
-
-          if (tokenOrError.error) {
-            this.handleUnauthorized();
-            this.showErrorToast(tokenOrError.error.message);
-            return { status: response.status, error: tokenOrError.error };
-          }
-
-          await AsyncStorage.setItem(
-            this.tokenKey,
-            tokenOrError.data?.token || ""
-          );
-          return this.request<T>(
-            this.addNewTokenToHeaders(tokenOrError.data?.token || "", data)
-          );
-        }
-        if (
-          responseData.error?.statusCode === "UnauthorizedException" &&
-          !this.whiteListUrl.some((url) => data.url.includes(url))
-        ) {
-          this.handleUnauthorized();
-        }
-
-        this.showErrorToast(responseData?.message || "Erro desconhecido");
-
-        const message = Array.isArray(responseData?.message)
-          ? responseData?.message?.[0]
-          : responseData?.message;
-
-        this.showErrorToast(message || "Erro desconhecido");
-        throw new Error(message || "Erro na requisição");
+    if (!response.ok) {
+      if (responseData?.error?.code === "ExpiredTokenException") {
+        const refreshedResponse = await this.handleRefreshToken<T>(data);
+        return refreshedResponse;
       }
 
-      return { status: response.status, data: responseData };
-    } catch (error: any) {
-      console.log(error);
-      const message = error?.message || "Erro de rede";
+      if (response.status === 401) {
+        this.clearAuthTokens();
+        throw new UnauthorizedError();
+      }
 
-      console.log("oi", message, error);
-      this.showErrorToast(message);
-      throw new Error(message);
+      const message = Array.isArray(responseData?.message)
+        ? responseData?.message?.[0]
+        : responseData?.message;
+      throw new Error(message || "Ocorreu um erro na requisição");
     }
+
+    return { status: response.status, data: responseData };
   }
 
-  private async getRefreshToken(
-    refreshToken: string | null
-  ): Promise<HttpResponse<{ token: string }>> {
+  private async handleRefreshToken<T>(
+    originalRequest: HttpRequest
+  ): Promise<HttpResponse<T>> {
+    const refreshToken = localStorage.getItem(this.refreshTokenKey);
     if (!refreshToken) {
-      const error = {
-        code: "NoRefreshToken",
-        message: "Refresh token não encontrado",
-      };
-      this.showErrorToast(error.message);
-      return {
-        status: 401,
-        error,
-      };
+      this.clearAuthTokens();
+      throw new UnauthorizedError();
     }
 
     try {
-      const response = await fetch(`${this.baseUrl}/account/refresh-token`, {
+      const refreshResponse = await fetch(`${this.baseUrl}/auth/refresh`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
       });
 
-      const responseData = await response.json();
+      const refreshData = await refreshResponse.json();
 
-      if (!response.ok) {
-        this.showErrorToast(responseData?.message || "Erro ao renovar token");
-        return { status: response.status, error: responseData.error };
+      if (!refreshResponse.ok) {
+        throw new Error("Falha ao renovar a sessão");
       }
 
-      return {
-        status: response.status,
-        data: { token: responseData.accessToken },
-      };
-    } catch (error) {
-      console.error("Erro ao renovar token:", error);
-      this.showErrorToast("Erro de rede");
-      return {
-        status: 500,
-        error: { code: "NetworkError", message: "Erro de rede" },
-      };
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+        refreshData;
+
+      localStorage.setItem(this.tokenKey, newAccessToken);
+      localStorage.setItem(this.refreshTokenKey, newRefreshToken);
+
+      return this.request<T>(originalRequest);
+    } catch {
+      this.clearAuthTokens();
+      throw new UnauthorizedError();
     }
   }
 
-  private addNewTokenToHeaders(
-    newAccessToken: string,
-    request: HttpRequest
-  ): HttpRequest {
-    return {
-      ...request,
-      headers: {
-        ...request.headers,
-        Authorization: `Bearer ${newAccessToken}`,
-      },
-    };
-  }
-
-  private async handleUnauthorized() {
-    await AsyncStorage.removeItem(this.tokenKey);
-    await AsyncStorage.removeItem(this.refreshTokenKey);
-    console.warn("Usuário não autorizado. Redirecionando para login...");
-    this.showErrorToast("Usuário não autorizado. Faça login novamente.");
-  }
-
-  private showErrorToast(message: string) {
-    console.log({ message });
+  private clearAuthTokens() {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.refreshTokenKey);
   }
 }
 
-export const httpClient = new AuthorizedHttpClient();
+export const httpClient = new HttpClient();
