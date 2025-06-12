@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { SurveyQuestion } from "@/application/feature/survey/survey-form/type/survey";
+import type { SurveyQuestion } from "@/application/feature/survey/components/survey-form/type/survey";
 import {
   TextInput,
   SelectInput,
@@ -13,7 +13,7 @@ import {
 } from "@/application/shared/components/form";
 import { CheckboxGroupInput } from "@/application/shared/components/form/checkbox-group-input";
 import { MaskedInput } from "@/application/shared/components/form/mask-input";
-import { getValidationRules } from "@/survey-form/helper/get-validation-rules";
+import { getValidationRules } from "../../helper/get-validation-rules";
 
 interface Props {
   question: SurveyQuestion;

@@ -6,20 +6,21 @@ import { cn } from "@/application/shared/lib/utils";
 
 const buttonVariants = cva(
   // Classes base, estão boas.
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none shrink-0 [&_svg]:shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
   {
     variants: {
       variant: {
         // Este funciona em ambos os temas, pois as variáveis CSS mudam
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/90 dark:text-white",
 
         // Este também funciona, pois 'destructive' e 'destructive-foreground' são um par
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 text-white",
 
         // Esta é a forma correta para o outline, usando as variáveis que mudam com o tema
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-accent text-card-foreground hover:text-card-foreground/50",
 
         // O par 'secondary' e 'secondary-foreground' também é feito para funcionar nos dois temas
         secondary:

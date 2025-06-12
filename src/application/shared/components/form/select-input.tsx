@@ -73,9 +73,14 @@ export const SelectInput = ({
       name={name}
       rules={validationRules}
       render={({ field, fieldState }) => (
-        <FormItem className={containerClassName}>
+        <FormItem className={cn("text-card-foreground", containerClassName)}>
           {label && (
-            <FormLabel className={cn(fieldState.error && "text-destructive")}>
+            <FormLabel
+              className={cn(
+                "text-card-foreground",
+                fieldState.error && "text-destructive"
+              )}
+            >
               {label}
               {required && <span className="ml-0.5 text-destructive">*</span>}
             </FormLabel>

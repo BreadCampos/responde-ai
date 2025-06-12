@@ -1,4 +1,4 @@
-import type { SurveyQuestion } from "@/application/feature/survey/survey-form/type/survey";
+import type { SurveyQuestion } from "@/application/feature/survey/components/survey-form/type/survey";
 import { Label } from "@radix-ui/react-label";
 import { Controller, useFormContext } from "react-hook-form";
 

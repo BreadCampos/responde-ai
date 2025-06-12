@@ -46,8 +46,9 @@ export const CheckboxGroupInput = ({
       name={name}
       rules={validationRules}
       render={() => (
-        // Não precisamos do 'field' aqui, pois cada item terá o seu
-        <FormItem className={cn("space-y-3", containerClassName)}>
+        <FormItem
+          className={cn("space-y-3 text-card-foreground", containerClassName)}
+        >
           <div className="mb-4">
             {label && (
               <FormLabel>

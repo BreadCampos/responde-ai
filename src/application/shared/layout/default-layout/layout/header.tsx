@@ -5,7 +5,7 @@ export const Header = () => {
   const { user } = useAuthStore();
 
   return (
-    <header className="bg-card text-foreground shadow-md p-4 z-10">
+    <header className="bg-card text-foreground shadow-md p-4 z-10 transition-all">
       <div className="flex items-center justify-end">
         <span className="text-card-foreground font-medium">
           {user?.firstName}

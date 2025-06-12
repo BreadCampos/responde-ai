@@ -2,15 +2,15 @@
 // Em ValidationRules.tsx
 
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form";
-import {
-  validationMap,
-  type QuestionValidatorsType,
-  type SurveyQuestionInputType,
-} from "@/survey-form/type/survey";
 import { Button } from "@/application/shared/components/button";
 import { SelectInput } from "@/application/shared/components/form/select-input";
 import { TextInput } from "@/application/shared/components/form/text-input";
 import { XIcon } from "lucide-react";
+import {
+  validationMap,
+  type QuestionValidatorsType,
+  type SurveyQuestionInputType,
+} from "../../../../type/survey";
 
 interface ValidationRuleRowProps {
   index: number;
@@ -95,7 +95,7 @@ export const ValidationRules = () => {
 
   return (
     <div className="space-y-3 pt-4 border-t">
-      <h4 className="font-medium text-gray-800">Regras de Validação</h4>
+      <h4 className="font-medium text-card-foreground">Regras de Validação</h4>
       {fields.map((field, index) => (
         <ValidationRuleRow
           key={field.id}

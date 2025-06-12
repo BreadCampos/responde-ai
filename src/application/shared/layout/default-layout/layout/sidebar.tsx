@@ -1,7 +1,6 @@
 import { useAuthStore } from "@/application/feature/authentication/store/use-auth.store";
 import { Button } from "@/application/shared/components/button";
 import usePersistentState from "@/application/shared/hooks/use-persist";
-import { useTheme } from "@/application/shared/hooks/use-theme";
 import { cn } from "@/application/shared/lib/utils";
 import { ROUTES } from "@/core/routes/route-constants";
 import {
@@ -20,7 +19,7 @@ type NavItemProps = {
   isLogout?: boolean;
 };
 const mainLinks = [
-  { name: "Formulários", href: ROUTES.LOGIN, icon: FileText },
+  { name: "Formulários", href: ROUTES.SURVEY_LIST, icon: FileText },
   { name: "Webhooks", href: ROUTES.REGISTER, icon: Webhook },
 ];
 
@@ -44,10 +43,10 @@ const NavItem = ({
   return (
     <Button
       onClick={handleClick}
-      variant={isLogout ? "destructive" : "ghost"}
+      variant={isLogout ? "destructive" : "outline"}
       className={isCollapsed ? "justify-center" : "justify-start"}
     >
-      <Icon size={24} className="flex-shrink-0" />
+      <Icon size={isCollapsed ? 24 : 18} className={cn("flex-shrink-0")} />
       {!isCollapsed && (
         <p className={cn("text-lg truncate", isLogout && "text-white")}>
           {name}
@@ -63,15 +62,13 @@ export const Sidebar = () => {
     false
   );
 
-  const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   return (
     <aside
       className={cn(
         "h-screen  shadow-md bg-card p-4 flex flex-col justify-between transition-all duration-300 ease-in-out",
         isCollapsed ? "w-20" : "w-64 text-foreground",
-        isDarkMode ? "text-white" : "text-foreground"
+        "text-foreground dark:text-white"
       )}
     >
       <div>

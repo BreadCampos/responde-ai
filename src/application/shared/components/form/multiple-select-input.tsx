@@ -43,7 +43,7 @@ export const SelectMultipleInput = ({
       defaultValue={[]}
       rules={validationRules}
       render={({ field, fieldState }) => (
-        <FormItem className={cn("w-full")}>
+        <FormItem className={cn("w-full text-card-foreground")}>
           {label && (
             <FormLabel className={cn(fieldState.error && "text-destructive")}>
               {label}

@@ -1,10 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { InputPreview } from "@/survey-form/components/input-preview";
 import { ChevronsUpDown, Edit, Trash2 } from "lucide-react";
 import { useFormContext } from "react-hook-form";
-import { shouldShowQuestion } from "@/survey-form/helper/shouled-show-question";
-import type { SurveyQuestion } from "@/application/feature/survey/survey-form/type/survey";
+import type { SurveyQuestion } from "@/application/feature/survey/components/survey-form/type/survey";
+import { shouldShowQuestion } from "../../helper/shouled-show-question";
+import { InputPreview } from "../input-preview";
 interface Props {
   question: SurveyQuestion;
   onDelete: (questionId: string) => void;
@@ -34,9 +34,9 @@ export function SortableQuestionItem({ onDelete, question, onEdit }: Props) {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="p-2 border rounded-md bg-white shadow-sm"
+      className="p-2 border rounded-md bg-card shadow-sm"
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex items-center justify-between gap-2 ">
         <div className="flex-1">
           <InputPreview question={question} />
         </div>
@@ -58,7 +58,7 @@ export function SortableQuestionItem({ onDelete, question, onEdit }: Props) {
             <Trash2 className="h-4 w-4" />
           </button>
 
-          <div {...listeners} className="p-2 cursor-grab">
+          <div {...listeners} className="p-2 cursor-grab text-card-foreground">
             <ChevronsUpDown />
           </div>
         </div>

@@ -52,9 +52,9 @@ export const Modal = ({
       <DialogOverlay />
       <DialogContent className={cn("flex flex-col w-fit", className)}>
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="text-card-foreground">{title}</DialogTitle>
           {description && (
-            <DialogDescription className="text-stone-500">
+            <DialogDescription className="text-muted-foreground">
               {description}
             </DialogDescription>
           )}

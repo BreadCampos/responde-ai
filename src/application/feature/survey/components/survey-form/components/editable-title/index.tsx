@@ -56,7 +56,7 @@ export const EditableTitle = ({
         onKeyDown={handleKeyDown}
         className={cn(
           "p-2 -m-2 bg-background border border-primary rounded-md outline-none",
-          className // Permite aplicar estilos de fora (como tamanho da fonte)
+          className
         )}
       />
     );

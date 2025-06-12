@@ -11,15 +11,15 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { XIcon } from "lucide-react";
 import { Label } from "@/application/shared/components/ui/label";
 import { useEffect, type Key } from "react";
-import type {
-  QuestionValidators,
-  SelectOption,
-  SurveyQuestion,
-  SurveyQuestionInputType,
-} from "@/survey-form/type/survey";
 import { QuestionPreview } from "./components/question-preview";
 import { ConditionalValues } from "./components/conditional-values";
 import { ValidationRules } from "./components/validation-rules";
+import type {
+  SurveyQuestion,
+  QuestionValidators,
+  SelectOption,
+  SurveyQuestionInputType,
+} from "../../type/survey";
 
 interface Props {
   onAddQuestion: (question: SurveyQuestion) => void;
@@ -208,9 +208,11 @@ export const ServeyModal = ({
           }}
           className="max-h-[85vh] max-w-4xl"
         >
-          <div className="flex flex-col w-[450px] gap-4 max-w-full">
-            <div className="flex-1 space-y-4  overflow-y-auto max-h-[40vh] px-5">
-              <h3 className="text-lg font-semibold mb-2">Especificação</h3>
+          <div className="flex flex-col w-[600px] gap-4 max-w-full">
+            <div className="flex-1 space-y-4  overflow-y-auto max-h-[50vh] px-5">
+              <h3 className="text-lg font-semibold mb-2 text-accent-foreground">
+                Especificação
+              </h3>
               <TextInput name={"label"} label={"Titulo da questão"} required />
               <SelectInput
                 required
@@ -237,8 +239,8 @@ export const ServeyModal = ({
               )}
 
               {formValues?.type === "rating" && (
-                <div className="p-4 bg-gray-50 rounded-md space-y-4 border">
-                  <h4 className="font-medium text-gray-800">
+                <div className="p-4 bg-card rounded-md space-y-4 border">
+                  <h4 className="font-medium text-card-foreground">
                     Opções de Avaliação
                   </h4>
                   <div className="flex gap-4">

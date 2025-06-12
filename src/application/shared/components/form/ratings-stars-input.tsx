@@ -51,7 +51,7 @@ export const RatingStarsInput = ({
       render={({ field, fieldState }) => (
         <FormItem
           className={cn(
-            "space-y-3",
+            "space-y-3 text-card-foreground",
             containerClassName,
             fieldState.error && "text-destructive"
           )}

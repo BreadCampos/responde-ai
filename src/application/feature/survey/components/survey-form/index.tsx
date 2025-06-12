@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { shouldShowQuestion } from "./helper/shouled-show-question";
 import { Button } from "@/application/shared/components/button";
 import { useToggle } from "@/application/shared/hooks/use-toggle";
+import { BackButton } from "@/application/shared/components/back-button";
 
 export const SurveyForm = () => {
   // const [survey, setSurvey] = useState<Survey>({
@@ -364,16 +365,19 @@ export const SurveyForm = () => {
 
   return (
     <Form {...methods}>
-      <div className="flex flex-col items-center justify-center p-4">
-        <div className="mb-4 text-left flex justify-between items-center w-8/12">
-          <EditableTitle
-            initialTitle={survey.title}
-            onSave={handleTitleChange}
-            className="text-3xl font-bold text-gray-800"
-          />
+      <div className="flex flex-col items-center justify-center p-4 max-h-11/12">
+        <div className="mb-4 text-left flex justify-between items-center w-11/12 ">
+          <BackButton>
+            <EditableTitle
+              initialTitle={survey.title}
+              onSave={handleTitleChange}
+              className="text-2xl font-bold text-card-foreground"
+            />
+          </BackButton>
 
           <Button onClick={handleOpenToAdd}>Adicionar Pergunta +</Button>
         </div>
+
         <ServeyModal
           isOpen={isModalOpen}
           onClose={toggleModal}
@@ -384,9 +388,9 @@ export const SurveyForm = () => {
         />
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="space-y-4 w-[700px] mx-auto"
+          className="space-y-4 w-[800px] mx-auto overflow-x-scroll"
         >
-          <div className="p-6 border rounded-lg mt-4 space-y-4 bg-gray-50">
+          <div className="p-6 border rounded-lg mt-4 space-y-4 bg-card shadow-md">
             <DndContext
               collisionDetection={closestCenter}
               onDragEnd={handleDragEnd}

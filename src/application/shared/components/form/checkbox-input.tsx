@@ -52,7 +52,7 @@ export const CheckboxInput = ({
       render={({ field, fieldState }) => (
         <FormItem
           className={cn(
-            "flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4",
+            "flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 text-card-foreground",
             containerClassName,
             fieldState.error &&
               "border-destructive focus-within:border-destructive"

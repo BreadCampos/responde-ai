@@ -8,16 +8,16 @@ import {
   type SelectOption,
 } from "@/application/shared/components/form";
 import { Label } from "@/application/shared/components/ui/label";
-import {
-  operatorMap,
-  type QuestionConditionOperators,
-  type SurveyQuestion,
-} from "@/survey-form/type/survey";
 
 import type { IForm } from "../../index";
 import { XIcon } from "lucide-react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { useEffect, useMemo } from "react";
+import {
+  operatorMap,
+  type QuestionConditionOperators,
+  type SurveyQuestion,
+} from "../../../../type/survey";
 
 interface Props {
   existingQuestions: SurveyQuestion[];
@@ -81,7 +81,7 @@ export const ConditionalValues = ({ existingQuestions }: Props) => {
       />
 
       {formValues?.enableConditional && (
-        <div className="p-4 bg-gray-50 rounded-md space-y-4">
+        <div className="p-4 bg-card rounded-md space-y-4">
           <SelectInput
             required={formValues?.enableConditional}
             name="conditionalFieldId"

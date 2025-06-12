@@ -69,7 +69,12 @@ export const TextInput = ({
       name={name}
       rules={validationRules}
       render={({ field, fieldState }) => (
-        <div className={cn("w-full space-y-1", containerClassName)}>
+        <div
+          className={cn(
+            "w-full space-y-1 text-card-foreground text-card-foreground",
+            containerClassName
+          )}
+        >
           <FormItem>
             {label && (
               <div className="flex items-center gap-1">

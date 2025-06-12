@@ -48,7 +48,9 @@ export const TextareaInput = ({
       name={name}
       rules={validationRules}
       render={({ field, fieldState }) => (
-        <FormItem className={cn("w-full", containerClassName)}>
+        <FormItem
+          className={cn("w-full text-card-foreground", containerClassName)}
+        >
           {label && (
             <FormLabel
               htmlFor={name}

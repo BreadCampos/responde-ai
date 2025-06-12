@@ -111,7 +111,12 @@ export const MaskedInput = ({
       name={name}
       rules={validationRules}
       render={({ field, fieldState }) => (
-        <div className={cn("w-full space-y-1", containerClassName)}>
+        <div
+          className={cn(
+            "w-full space-y-1 text-card-foreground",
+            containerClassName
+          )}
+        >
           <FormItem>
             {label && (
               <Label

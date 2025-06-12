@@ -54,7 +54,12 @@ export const LoginScreen = () => {
             type={showPassword ? "text" : "password"}
             required
             symbol={
-              <Button onClick={setShowPassword} variant={"ghost"} type="button">
+              <Button
+                onClick={setShowPassword}
+                variant={"ghost"}
+                type="button"
+                autoFocus={false}
+              >
                 {showPassword ? (
                   <Eye className="h-4 w-4" />
                 ) : (
