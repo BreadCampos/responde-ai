@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState, type ReactNode } from "react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 
 type Theme = "light" | "dark";
 
@@ -11,7 +12,7 @@ export const ThemeProviderContext = createContext<
   ThemeProviderState | undefined
 >(undefined);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children, ...props }: { children: ReactNode }) {
   // Inicia o tema com base no localStorage ou preferência do sistema
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== "undefined") {
@@ -51,7 +52,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ThemeProviderContext.Provider value={value}>
-      {children}
+      <NextThemesProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        {...props}
+      >
+        {children}
+      </NextThemesProvider>
     </ThemeProviderContext.Provider>
   );
 }

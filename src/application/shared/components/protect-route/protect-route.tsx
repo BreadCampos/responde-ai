@@ -3,6 +3,7 @@ import { Navigate, type RouteProps } from "react-router-dom";
 
 import type { IRoute } from "@/core/routes/types/route-types";
 import { ROUTES } from "@/core/routes/route-constants";
+import { useAuthStore } from "@/application/feature/authentication/store/use-auth.store";
 
 type Props = RouteProps & {
   private: boolean;
@@ -11,9 +12,7 @@ type Props = RouteProps & {
 };
 
 const ProtectRoute = ({ private: isPrivate, Layout, element }: Props) => {
-  // const { isAuthenticated } = useAuth();
-
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuthStore();
 
   const redirect = ROUTES?.LOGIN;
 

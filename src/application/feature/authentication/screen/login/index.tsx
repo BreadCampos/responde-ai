@@ -5,14 +5,15 @@ import { useToggle } from "@/application/shared/hooks/use-toggle";
 import { Eye, EyeClosed } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { loginResolver, type LoginFormValues } from "./login.schema";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/core/routes/route-constants";
+import { useLoginMutation } from "../../service/login-mutation";
 
 export const LoginScreen = () => {
   const methods = useForm<LoginFormValues>({
     resolver: loginResolver,
   });
+
   const [showPassword, setShowPassword] = useToggle();
 
   const navigate = useNavigate();
@@ -20,10 +21,10 @@ export const LoginScreen = () => {
     navigate(ROUTES.REGISTER);
   };
 
+  const login = useLoginMutation();
+
   const onSubmit = (data: LoginFormValues) => {
-    console.log("Form submitted with data:", data);
-    // Handle login logic here};
-    toast.success("não integrado!");
+    login.mutateAsync(data);
   };
 
   return (
@@ -37,9 +38,9 @@ export const LoginScreen = () => {
         </div>
         <div className="space-y-4">
           <TextInput
-            name={"login"}
+            name={"email"}
             placeholder="john.doe@addres.com"
-            label={"Login"}
+            label={"Email"}
             autoFocus
             required
             type="email"

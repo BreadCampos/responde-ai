@@ -16,6 +16,7 @@ import { useRegisterMutation } from "../../service/register-mutation";
 import { useCreateCompanyMutation } from "@/application/feature/company/service/create-company";
 import { toast } from "sonner";
 import React from "react";
+import { ROUTES } from "@/core/routes/route-constants";
 
 const stepFields = [
   [
@@ -39,10 +40,10 @@ export const Register = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const registerMutation = useRegisterMutation();
   const createCompanyMutation = useCreateCompanyMutation();
-  const navigte = useNavigate();
+  const navigate = useNavigate();
 
   const onBack = () => {
-    navigte(-1);
+    navigate(-1);
   };
 
   const methods = useForm({
@@ -124,7 +125,7 @@ export const Register = () => {
       await createCompanyMutation.mutateAsync(formatDocument, {});
 
       if (accessToken) {
-        navigte("/");
+        navigate(ROUTES.DASHBOARD, { replace: true });
       }
     } catch (error: any) {
       console.error("Falha no processo de cadastro:", error);

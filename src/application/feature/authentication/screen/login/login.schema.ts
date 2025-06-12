@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export const loginSchema = z.object({
-  login: z
+  email: z
     .string({ message: "A email é obrigatória." })
     .email({ message: "Por favor, insira um e-mail válido." }),
   password: z

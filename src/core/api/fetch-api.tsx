@@ -44,6 +44,7 @@ class HttpClient {
       }
 
       if (response.status === 401) {
+        console.log(response);
         this.clearAuthTokens();
         throw new UnauthorizedError();
       }
